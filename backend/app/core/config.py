@@ -14,7 +14,11 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
 
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]
+    CORS_ORIGIN_REGEX: str = r"https://.*\.up\.railway\.app"
 
     # Alert thresholds
     SOC_OVERCHARGE_THRESHOLD: float = 95.0
