@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Variables ─────────────────────────────────────── */
+:root {
+  --bg-base:     #0a0f1e;
+  --bg-surface:  #0d1424;
+  --bg-card:     #111827;
+  --bg-card-hover: #141e30;
+  --bg-input:    #0d1424;
+  --border:      #1e293b;
+  --border-hover:#2d3f55;
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+  --accent:      #3b82f6;
+  --accent-hover:#2563eb;
+}
+
+html[data-theme="light"] {
+  --bg-base:     #f1f5f9;
+  --bg-surface:  #e2e8f0;
+  --bg-card:     #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input:    #f8fafc;
+  --border:      #e2e8f0;
+  --border-hover:#cbd5e1;
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
+  --accent:      #2563eb;
+  --accent-hover:#1d4ed8;
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+@layer base {
+  html, body, #root {
+    height: 100%;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+  }
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    transition: background-color 0.25s, color 0.25s;
+  }
+  * { box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+}
+
+/* ── Components ────────────────────────────────────────── */
+@layer components {
+  .card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    @apply rounded-xl p-5 transition-colors duration-200;
+  }
+  .card-hover {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    @apply rounded-xl p-5 transition-all duration-200 cursor-pointer;
+  }
+  .card-hover:hover {
+    background-color: var(--bg-card-hover);
+    border-color: var(--accent);
+  }
+
+  .sidebar {
+    background-color: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    @apply transition-colors duration-200;
+  }
+
+  .nav-link {
+    color: var(--text-secondary);
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150;
+  }
+  .nav-link:hover {
+    color: var(--text-primary);
+    background-color: var(--border);
+  }
+  .nav-link.active {
+    color: var(--accent);
+    background-color: rgba(59,130,246,0.12);
+  }
+
+  .page-title {
+    color: var(--text-primary);
+    @apply text-2xl font-bold;
+  }
+  .page-subtitle {
+    color: var(--text-secondary);
+    @apply text-sm mt-1;
+  }
+
+  .label {
+    color: var(--text-muted);
+    @apply text-xs uppercase tracking-widest;
+  }
+
+  .value-text {
+    color: var(--text-primary);
+    @apply font-bold;
+  }
+
+  .secondary-text {
+    color: var(--text-secondary);
+  }
+
+  .muted-text {
+    color: var(--text-muted);
+  }
+
+  .input-field {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    @apply w-full rounded-lg px-3 py-2.5 text-sm transition-colors;
+  }
+  .input-field:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .input-field::placeholder {
+    color: var(--text-muted);
+  }
+
+  .btn-primary {
+    background-color: var(--accent);
+    @apply text-white font-medium rounded-lg py-2.5 px-4 text-sm transition-colors;
+  }
+  .btn-primary:hover {
+    background-color: var(--accent-hover);
+  }
+
+  .divider {
+    border-color: var(--border);
+    @apply border-b;
+  }
+
+  /* Alert badges */
+  .badge-critical { @apply bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-2 py-0.5 text-xs font-semibold; }
+  .badge-high     { @apply bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-2 py-0.5 text-xs font-semibold; }
+  .badge-medium   { @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-full px-2 py-0.5 text-xs font-semibold; }
+  .badge-low      { @apply bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-2 py-0.5 text-xs font-semibold; }
+
+  /* Stat inner box */
+  .stat-box {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    @apply rounded-lg p-3;
+  }
+}
