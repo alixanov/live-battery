@@ -259,7 +259,7 @@ function VehicleCard({ vehicle }: { vehicle: any }) {
             <YAxis domain={['dataMin - 0.2', 'dataMax + 0.2']} hide />
             <Tooltip content={({ active, payload }) => active && payload?.length ? (
               <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px', ...MONO, fontSize: 11, color: 'var(--text-primary)' }}>
-                {(+payload[0].value).toFixed(2)}%
+                {(+(payload[0]?.value ?? 0)).toFixed(2)}%
               </div>
             ) : null} />
             <Area type="monotone" dataKey="soh" stroke={sohC} strokeWidth={1.5}
