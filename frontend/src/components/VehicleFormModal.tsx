@@ -33,26 +33,30 @@ const EMPTY: Omit<Vehicle, 'vehicle_id'> = {
   initial_cycles: 0,
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({ label, hint, error, children }: { label: string; hint?: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
       <label className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{label}</label>
       {children}
-      {hint && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
+      {hint && !error && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{hint}</p>}
+      {error && <p className="text-xs font-medium" style={{ color: '#f87171' }}>{error}</p>}
     </div>
   )
 }
 
-function Input({ value, onChange, type = 'text', placeholder, min, max, step }: any) {
+function Input({ value, onChange, type = 'text', placeholder, min, max, step, disabled }: any) {
   return (
     <input
       type={type} value={value} onChange={onChange} placeholder={placeholder}
-      min={min} max={max} step={step}
-      className="w-full px-3 py-2 rounded-lg text-sm outline-none transition-colors"
+      min={min} max={max} step={step} disabled={disabled}
+      className="w-full px-3 py-2.5 rounded-xl text-sm outline-none transition-colors"
       style={{
-        backgroundColor: 'var(--bg-surface)',
-        border: '1px solid var(--border)',
-        color: 'var(--text-primary)',
+        backgroundColor: disabled ? 'var(--bg-surface)' : 'var(--bg-surface)',
+        border: '1.5px solid var(--border)',
+        color: disabled ? 'var(--text-muted)' : 'var(--text-primary)',
+        opacity: disabled ? 0.6 : 1,
+        WebkitAppearance: 'none',
+        fontSize: 16, // prevents iOS zoom on focus
       }}
       onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
       onBlur={e => (e.target.style.borderColor = 'var(--border)')}
@@ -65,18 +69,20 @@ function Select({ value, onChange, options }: { value: string; onChange: (v: str
     <div className="relative">
       <select
         value={value} onChange={e => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-lg text-sm outline-none appearance-none transition-colors pr-8"
+        className="w-full px-3 py-2.5 rounded-xl text-sm outline-none appearance-none transition-colors pr-8"
         style={{
           backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
+          border: '1.5px solid var(--border)',
           color: 'var(--text-primary)',
+          WebkitAppearance: 'none',
+          fontSize: 16, // prevents iOS zoom
         }}
         onFocus={e => (e.target.style.borderColor = 'var(--accent)')}
         onBlur={e => (e.target.style.borderColor = 'var(--border)')}
       >
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
-      <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
+      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
         style={{ color: 'var(--text-muted)' }} />
     </div>
   )
@@ -88,16 +94,29 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
     vehicle_id: '', ...EMPTY,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (editing) {
-      setForm({ ...editing })
+    if (open) {
+      if (editing) {
+        setForm({ ...editing })
+      } else {
+        const nextNum = vehicles.length + 1
+        setForm({ vehicle_id: `EV-${String(nextNum).padStart(3, '0')}`, ...EMPTY })
+      }
+      setErrors({})
+      // small delay so CSS transition plays
+      requestAnimationFrame(() => setVisible(true))
     } else {
-      const nextNum = vehicles.length + 1
-      setForm({ vehicle_id: `EV-${String(nextNum).padStart(3, '0')}`, ...EMPTY })
+      setVisible(false)
     }
-    setErrors({})
   }, [editing, open])
+
+  // lock body scroll
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [open])
 
   function set(key: keyof typeof form, val: any) {
     setForm(f => ({ ...f, [key]: val }))
@@ -141,66 +160,100 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
-      onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden"
-        style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+    <>
+      {/* ── Backdrop ── */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 50,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          backdropFilter: 'blur(3px)',
+          WebkitBackdropFilter: 'blur(3px)',
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 0.25s ease',
+        }}
+      />
+
+      {/* ── Modal: bottom-sheet on mobile, centered dialog on md+ ── */}
+      <div
+        style={{
+          position: 'fixed', zIndex: 51,
+          // Mobile: bottom sheet
+          bottom: 0, left: 0, right: 0,
+          // Desktop override via media query below
+          transition: 'transform 0.32s cubic-bezier(0.32,0.72,0,1)',
+          transform: visible ? 'translateY(0)' : 'translateY(100%)',
+          maxHeight: '92dvh',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: 'var(--bg-card)',
+          borderTop: '1px solid var(--border)',
+          borderRadius: '20px 20px 0 0',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+        }}
+        className="modal-sheet"
+      >
+        {/* Drag handle (mobile only) */}
+        <div className="flex justify-center pt-3 pb-1 md:hidden">
+          <div className="w-10 h-1 rounded-full" style={{ backgroundColor: 'var(--border)' }} />
+        </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center justify-between px-5 py-3 md:py-4 shrink-0"
+          style={{ borderBottom: '1px solid var(--border)' }}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(59,130,246,0.12)' }}>
-              <Car size={16} style={{ color: 'var(--accent)' }} />
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)', boxShadow: '0 3px 10px rgba(59,130,246,0.3)' }}>
+              <Car size={15} color="#fff" />
             </div>
-            <h2 className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-              {editing ? 'Редактировать транспортное средство' : 'Добавить транспортное средство'}
+            <h2 className="font-semibold" style={{ color: 'var(--text-primary)', fontSize: 15 }}>
+              {editing ? 'Редактировать авто' : 'Добавить автомобиль'}
             </h2>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg transition-colors"
-            style={{ color: 'var(--text-muted)' }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
-            <X size={18} />
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors shrink-0"
+            style={{ color: 'var(--text-muted)', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+            <X size={16} />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="overflow-y-auto p-6 space-y-6">
+        {/* Scrollable body */}
+        <div className="overflow-y-auto flex-1 px-5 py-5 space-y-6"
+          style={{ WebkitOverflowScrolling: 'touch' }}>
 
           {/* Section: ТС */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Car size={14} style={{ color: 'var(--accent)' }} />
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
+              <div className="w-5 h-5 rounded-md flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(59,130,246,0.12)' }}>
+                <Car size={11} style={{ color: 'var(--accent)' }} />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
                 Транспортное средство
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="ID транспортного средства" hint="Уникальный идентификатор (напр. EV-006)">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="ID (напр. EV-006)" error={errors.vehicle_id}>
                 <Input value={form.vehicle_id} placeholder="EV-006"
                   onChange={(e: any) => set('vehicle_id', e.target.value)}
                   disabled={!!editing} />
-                {errors.vehicle_id && <p className="text-xs text-red-400 mt-1">{errors.vehicle_id}</p>}
               </Field>
               <Field label="Гос. номер">
                 <Input value={form.plate_number} placeholder="A 001 BC 77"
                   onChange={(e: any) => set('plate_number', e.target.value)} />
               </Field>
-              <Field label="Марка">
+              <Field label="Марка" error={errors.make}>
                 {form.make && !MAKES.includes(form.make) ? (
                   <Input value={form.make} placeholder="Введите марку"
                     onChange={(e: any) => set('make', e.target.value)} />
                 ) : (
                   <Select value={form.make || MAKES[0]} onChange={v => set('make', v)} options={MAKES} />
                 )}
-                {errors.make && <p className="text-xs text-red-400 mt-1">{errors.make}</p>}
               </Field>
-              <Field label="Модель">
+              <Field label="Модель" error={errors.model}>
                 <Input value={form.model} placeholder="Model 3"
                   onChange={(e: any) => set('model', e.target.value)} />
-                {errors.model && <p className="text-xs text-red-400 mt-1">{errors.model}</p>}
               </Field>
               <Field label="Год выпуска">
                 <Input type="number" value={form.year} min={2010} max={2030}
@@ -214,48 +267,49 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
           {/* Section: Аккумулятор */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Battery size={14} style={{ color: '#22c55e' }} />
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#22c55e' }}>
+              <div className="w-5 h-5 rounded-md flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(34,197,94,0.12)' }}>
+                <Battery size={11} style={{ color: '#22c55e' }} />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#22c55e' }}>
                 Параметры аккумулятора
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Производитель батареи">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Производитель батареи" error={errors.battery_brand}>
                 <Select value={form.battery_brand || BATTERY_BRANDS[0]}
                   onChange={v => set('battery_brand', v)} options={BATTERY_BRANDS} />
-                {errors.battery_brand && <p className="text-xs text-red-400 mt-1">{errors.battery_brand}</p>}
               </Field>
-              <Field label="Модель батареи">
+              <Field label="Модель батареи" error={errors.battery_model}>
                 <Input value={form.battery_model} placeholder="NCM9 Pouch"
                   onChange={(e: any) => set('battery_model', e.target.value)} />
-                {errors.battery_model && <p className="text-xs text-red-400 mt-1">{errors.battery_model}</p>}
               </Field>
-              <Field label="Химия электродов" hint="Влияет на расчёт SoH, IR и деградации">
+              <Field label="Химия электродов" hint="NMC / LFP / NCA / LTO">
                 <Select value={form.battery_chemistry}
                   onChange={v => set('battery_chemistry', v as any)} options={[...CHEMISTRIES]} />
               </Field>
-              <Field label="Номинальная ёмкость (кВт·ч)" hint="Используется для расчёта SoC и RUL">
+              <Field label="Ёмкость (кВт·ч)" error={errors.battery_nominal_capacity} hint="Используется для расчёта SoC">
                 <Input type="number" value={form.battery_nominal_capacity} min={1} max={500} step={0.1}
                   onChange={(e: any) => set('battery_nominal_capacity', e.target.value)} />
-                {errors.battery_nominal_capacity && <p className="text-xs text-red-400 mt-1">{errors.battery_nominal_capacity}</p>}
               </Field>
-              <Field label="Номинальное напряжение (В)" hint="Используется для расчёта мощности">
+              <Field label="Напряжение (В)" hint="Для расчёта мощности">
                 <Input type="number" value={form.battery_nominal_voltage} min={100} max={900} step={1}
                   onChange={(e: any) => set('battery_nominal_voltage', e.target.value)} />
               </Field>
-              <Field label="Количество ячеек" hint="Всего ячеек в пакете (для балансировки)">
+              <Field label="Кол-во ячеек" hint="Для балансировки">
                 <Input type="number" value={form.cell_count} min={1} max={10000} step={1}
                   onChange={(e: any) => set('cell_count', e.target.value)} />
               </Field>
-              <Field label="Конфигурация ячеек (S×P)" hint="Напр: 96s3p — 96 последовательно, 3 параллельно">
+              <Field label="Конфигурация (S×P)" hint="напр. 96s3p">
                 <Input value={form.cell_config} placeholder="96s3p"
                   onChange={(e: any) => set('cell_config', e.target.value)} />
               </Field>
-              <Field label="Дата производства батареи">
+              <Field label="Дата производства">
                 <Input type="month" value={form.manufacture_date}
                   onChange={(e: any) => set('manufacture_date', e.target.value)} />
               </Field>
-              <Field label="Начальный пробег (циклов)" hint="Циклы до начала мониторинга">
+              <Field label="Начальный пробег (циклов)" hint="До начала мониторинга">
                 <Input type="number" value={form.initial_cycles} min={0} max={5000} step={1}
                   onChange={(e: any) => set('initial_cycles', e.target.value)} />
               </Field>
@@ -264,23 +318,46 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="shrink-0 flex items-center gap-3 px-5 py-4"
+          style={{
+            borderTop: '1px solid var(--border)',
+            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+          }}>
           <button onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-            style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-surface)' }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--border)')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--bg-surface)')}>
+            className="flex-1 py-3 rounded-xl text-sm font-medium transition-colors"
+            style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
             Отмена
           </button>
           <button onClick={handleSubmit}
-            className="px-5 py-2 rounded-lg text-sm font-semibold transition-all"
-            style={{ backgroundColor: 'var(--accent)', color: '#fff' }}
+            className="flex-[2] py-3 rounded-xl text-sm font-semibold transition-all"
+            style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)', color: '#fff', boxShadow: '0 4px 14px rgba(59,130,246,0.35)' }}
             onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
             onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
-            {editing ? 'Сохранить изменения' : 'Добавить транспортное средство'}
+            {editing ? 'Сохранить' : 'Добавить автомобиль'}
           </button>
         </div>
       </div>
-    </div>
+
+      {/* Desktop: center override */}
+      <style>{`
+        @media (min-width: 768px) {
+          .modal-sheet {
+            bottom: auto !important;
+            left: 50% !important;
+            right: auto !important;
+            top: 50% !important;
+            transform: ${visible ? 'translate(-50%, -50%)' : 'translate(-50%, -48%) scale(0.97)'} !important;
+            width: 100% !important;
+            max-width: 640px !important;
+            border-radius: 20px !important;
+            border: 1px solid var(--border) !important;
+            border-top: 1px solid var(--border) !important;
+            max-height: 90vh !important;
+            opacity: ${visible ? 1 : 0};
+            transition: opacity 0.2s ease, transform 0.2s ease !important;
+          }
+        }
+      `}</style>
+    </>
   )
 }
