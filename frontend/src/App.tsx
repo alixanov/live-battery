@@ -12,7 +12,8 @@ function Layout() {
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-base)' }}>
-        {/* mobile: bottom padding for bottom nav */}
+        {/* mobile: top padding for fixed header */}
+        <div className="md:hidden" style={{ height: 56 }} />
         <Outlet />
         <div className="md:hidden" style={{ height: 60 }} />
       </main>
