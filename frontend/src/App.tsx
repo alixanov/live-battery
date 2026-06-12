@@ -5,14 +5,14 @@ import Vehicles from './pages/Vehicles'
 import VehicleDetail from './pages/VehicleDetail'
 import AlertsCenter from './pages/AlertsCenter'
 import Analytics from './pages/Analytics'
+import Compare from './pages/Compare'
 
 function Layout() {
   return (
     <div className="flex h-screen overflow-hidden" style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}>
       <Sidebar />
       <main className="flex-1 overflow-y-auto" style={{ backgroundColor: 'var(--bg-base)' }}>
-        {/* mobile: top padding for fixed header, bottom padding for bottom nav */}
-        <div className="md:hidden" style={{ height: 56 }} />
+        {/* mobile: bottom padding for bottom nav */}
         <Outlet />
         <div className="md:hidden" style={{ height: 60 }} />
       </main>
@@ -30,6 +30,7 @@ export default function App() {
           <Route path="/vehicles/:id" element={<VehicleDetail />} />
           <Route path="/alerts" element={<AlertsCenter />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/compare" element={<Compare />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

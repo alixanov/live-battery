@@ -28,6 +28,9 @@ interface AppStore {
   addVehicle: (v: Vehicle) => void
   updateVehicle: (v: Vehicle) => void
   deleteVehicle: (id: string) => void
+  resolvedAlerts: Set<string>
+  resolveAlert: (id: string) => void
+  clearResolvedAlerts: (keepIds: string[]) => void
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
@@ -53,5 +56,12 @@ export const useAppStore = create<AppStore>((set, get) => ({
     const next = get().vehicles.filter(x => x.vehicle_id !== id)
     saveVehicles(next)
     set({ vehicles: next })
+  },
+  resolvedAlerts: new Set<string>(),
+  resolveAlert: (id) => {
+    set(s => ({ resolvedAlerts: new Set([...s.resolvedAlerts, id]) }))
+  },
+  clearResolvedAlerts: (keepIds) => {
+    set({ resolvedAlerts: new Set(keepIds) })
   },
 }))

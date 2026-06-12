@@ -41,17 +41,29 @@ html[data-theme="light"] {
     color: var(--text-primary);
   }
   body {
+    font-family: 'Inter', system-ui, sans-serif;
     @apply font-sans antialiased;
     background-color: var(--bg-base);
     color: var(--text-primary);
     transition: background-color 0.25s, color 0.25s;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
   * { box-sizing: border-box; }
 
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: var(--bg-base); }
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+  /* mobile: smooth scroll */
+  @media (max-width: 767px) {
+    html { scroll-behavior: smooth; }
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
+  }
 }
 
 /* ── Components ────────────────────────────────────────── */

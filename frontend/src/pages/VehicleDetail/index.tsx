@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useDemoHistory, useDemoCells, useDemoVehicles } from '../../hooks/useDemoData'
 import { socColor, sohColor, sohLabel } from '../../utils/battery'
@@ -9,7 +9,64 @@ import RULChart from '../../components/charts/RULChart'
 import PowerChart from '../../components/charts/PowerChart'
 import TemperatureChart from '../../components/charts/TemperatureChart'
 import VehicleFormModal from '../../components/VehicleFormModal'
-import { ArrowLeft, Zap, Thermometer, Activity, TrendingDown, TrendingUp, Minus, Battery, HeartPulse, Scale, Calendar, PlugZap, Pencil } from 'lucide-react'
+import { ArrowLeft, Zap, Thermometer, Activity, TrendingDown, TrendingUp, Minus, Battery, HeartPulse, Scale, Calendar, PlugZap, Pencil, Download, History } from 'lucide-react'
+
+/* ── Generate mock charging sessions from history ── */
+function generateChargingSessions(vehicleId: string, capacity: number) {
+  const seed = vehicleId.charCodeAt(vehicleId.length - 1)
+  const sessions = []
+  const now = Date.now()
+
+  for (let i = 0; i < 10; i++) {
+    const daysAgo = i * (1.5 + ((seed * (i + 1)) % 3))
+    const startMs = now - daysAgo * 86_400_000 - ((seed * i) % 6) * 3_600_000
+    const startSoc = 15 + ((seed * (i + 3)) % 25)
+    const endSoc   = 75 + ((seed * (i + 1)) % 20)
+    const kwh      = +((endSoc - startSoc) / 100 * capacity).toFixed(1)
+    const durationMin = Math.round(kwh * (40 + (seed % 20)))
+    const cost     = +(kwh * 0.07).toFixed(2)
+
+    sessions.push({
+      id: i,
+      startTime: new Date(startMs).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+      startSoc,
+      endSoc,
+      kwh,
+      durationMin,
+      cost,
+    })
+  }
+  return sessions
+}
+
+/* ── CSV export ── */
+function exportCSV(vehicle: any, last: any) {
+  const rows = [
+    ['Параметр', 'Значение'],
+    ['Автомобиль', `${vehicle.make} ${vehicle.model} ${vehicle.year}`],
+    ['Гос. номер', vehicle.plate_number || '—'],
+    ['Химия батареи', vehicle.battery_chemistry],
+    ['Ёмкость (кВт·ч)', vehicle.battery_nominal_capacity],
+    ['SoH (%)', last.soh.toFixed(2)],
+    ['SoC (%)', last.soc.toFixed(2)],
+    ['Температура (°C)', last.temperature.toFixed(2)],
+    ['Напряжение (В)', last.voltage.toFixed(2)],
+    ['Ток (А)', last.current.toFixed(2)],
+    ['Мощность (кВт)', last.power_kw.toFixed(2)],
+    ['Сопротивление (мОм)', last.internal_resistance.toFixed(2)],
+    ['Остаточный ресурс (цикл)', last.rul_cycles],
+    ['Остаточный ресурс (дней)', last.rul_days],
+    ['Дата выгрузки', new Date().toLocaleString('ru-RU')],
+  ]
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n')
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `battery_report_${vehicle.vehicle_id}_${new Date().toISOString().slice(0,10)}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 function Delta({ current, prev, unit = '', invert = false }: any) {
   const d = +(current - prev).toFixed(2)
@@ -50,6 +107,10 @@ export default function VehicleDetail() {
   const history = useDemoHistory(id ?? 'EV-001', 60)
   const cells = useDemoCells(id ?? 'EV-001')
   const [editOpen, setEditOpen] = useState(false)
+  const chargingSessions = useMemo(
+    () => generateChargingSessions(vehicle?.vehicle_id ?? 'EV-001', vehicle?.battery_nominal_capacity ?? 75),
+    [vehicle?.vehicle_id, vehicle?.battery_nominal_capacity]
+  )
 
   const last = history[history.length - 1]
   const prev = history[history.length - 10] ?? last
@@ -82,6 +143,13 @@ export default function VehicleDetail() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={() => exportCSV(vehicle, last)}
+            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#22c55e'; e.currentTarget.style.borderColor = '#22c55e' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}>
+            <Download size={12} /> Экспорт CSV
+          </button>
           <button onClick={() => setEditOpen(true)}
             className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
             style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
@@ -309,6 +377,81 @@ export default function VehicleDetail() {
                 <p className="text-sm font-bold mt-0.5" style={{ color: item.color }}>{item.value}</p>
                 <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>{item.detail}</p>
               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── История зарядок ── */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: 'rgba(59,130,246,0.12)' }}>
+              <History size={14} style={{ color: 'var(--accent)' }} />
+            </div>
+            <div>
+              <p className="label">История зарядок</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Последние 10 сессий зарядки</p>
+            </div>
+          </div>
+          <span className="text-xs px-2 py-1 rounded"
+            style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: 'var(--accent)' }}>
+            {chargingSessions.length} сессий
+          </span>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto -mx-1">
+          <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                {['Дата / Время', 'Нач. SoC', 'Кон. SoC', 'Энергия', 'Длительность', 'Стоимость'].map(h => (
+                  <th key={h} className="text-left py-2 px-3 text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {chargingSessions.map((s, i) => (
+                <tr key={s.id}
+                  className="transition-colors"
+                  style={{ borderBottom: i < chargingSessions.length - 1 ? '1px solid var(--border)' : 'none' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--bg-surface)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
+                  <td className="py-3 px-3 text-xs" style={{ color: 'var(--text-secondary)' }}>{s.startTime}</td>
+                  <td className="py-3 px-3">
+                    <span className="text-xs font-medium" style={{ color: socColor(s.startSoc) }}>{s.startSoc}%</span>
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="text-xs font-medium" style={{ color: socColor(s.endSoc) }}>{s.endSoc}%</span>
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="text-xs font-bold" style={{ color: 'var(--accent)' }}>{s.kwh} кВт·ч</span>
+                  </td>
+                  <td className="py-3 px-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    {s.durationMin >= 60
+                      ? `${Math.floor(s.durationMin / 60)} ч ${s.durationMin % 60} мин`
+                      : `${s.durationMin} мин`}
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="text-xs font-medium" style={{ color: '#22c55e' }}>${s.cost}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Summary row */}
+        <div className="mt-4 pt-4 grid grid-cols-3 gap-3" style={{ borderTop: '1px solid var(--border)' }}>
+          {[
+            { label: 'Всего энергии', value: `${chargingSessions.reduce((a, s) => a + s.kwh, 0).toFixed(1)} кВт·ч` },
+            { label: 'Всего затрат', value: `$${chargingSessions.reduce((a, s) => a + s.cost, 0).toFixed(2)}` },
+            { label: 'Ср. длительность', value: (() => { const avg = Math.round(chargingSessions.reduce((a,s) => a + s.durationMin, 0) / chargingSessions.length); return avg >= 60 ? `${Math.floor(avg/60)} ч ${avg%60} мин` : `${avg} мин` })() },
+          ].map(item => (
+            <div key={item.label} className="p-3 rounded-xl text-center" style={{ backgroundColor: 'var(--bg-surface)' }}>
+              <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>{item.label}</p>
+              <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
             </div>
           ))}
         </div>

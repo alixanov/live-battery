@@ -42,4 +42,12 @@ app.include_router(websocket.router)
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "version": settings.VERSION}
+    from app.core.database import client
+    mongo_ok = False
+    if client:
+        try:
+            await client.admin.command("ping")
+            mongo_ok = True
+        except Exception:
+            pass
+    return {"status": "ok", "version": settings.VERSION, "mongo": mongo_ok}

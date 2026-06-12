@@ -113,7 +113,7 @@ export default function AlertsCenter() {
             </div>
             <p className="text-3xl font-bold" style={{ color: PRIORITY_COLORS[p] }}>{stats[p]}</p>
             <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-              {stats[p] === 0 ? 'Нет алертов' : 'активных'}
+              {stats[p] === 0 ? 'Нет предупреждений' : 'активных'}
             </p>
           </div>
         ))}
@@ -161,7 +161,7 @@ export default function AlertsCenter() {
             <CheckCircle className="mx-auto mb-3" size={40} style={{ color: '#22c55e' }} />
             <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>Всё в порядке</p>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {totalActive === 0 ? 'Нет активных предупреждений' : 'Нет алертов в выбранной категории'}
+              {totalActive === 0 ? 'Нет активных предупреждений' : 'Нет предупреждений в выбранной категории'}
             </p>
           </div>
         ) : (

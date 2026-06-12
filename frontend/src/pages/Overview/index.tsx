@@ -40,6 +40,26 @@ function FleetStatCard({ label, value, unit, delta, sparkData, color, icon }: an
   )
 }
 
+function SoHCircle({ soh }: { soh: number }) {
+  const r = 18
+  const circ = 2 * Math.PI * r
+  const fill = circ * (soh / 100)
+  const color = soh >= 80 ? '#22c55e' : soh >= 60 ? '#f59e0b' : '#ef4444'
+  return (
+    <div className="relative w-11 h-11 shrink-0">
+      <svg width="44" height="44" viewBox="0 0 44 44" style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx="22" cy="22" r={r} fill="none" stroke="var(--bg-surface)" strokeWidth="3.5" />
+        <circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="3.5"
+          strokeDasharray={`${fill} ${circ}`} strokeLinecap="round"
+          style={{ transition: 'stroke-dasharray 0.8s ease' }} />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold" style={{ color }}>{soh.toFixed(0)}</span>
+      </div>
+    </div>
+  )
+}
+
 function VehicleRow({ vehicle }: { vehicle: any }) {
   const history = useDemoHistory(vehicle.vehicle_id, 20)
   const last = history[history.length - 1]
@@ -56,10 +76,7 @@ function VehicleRow({ vehicle }: { vehicle: any }) {
         {/* Header row */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold"
-              style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--accent)' }}>
-              {vehicle.make[0]}
-            </div>
+            <SoHCircle soh={last.soh} />
             <div>
               <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
                 {vehicle.make} {vehicle.model}
@@ -202,19 +219,34 @@ function FleetStats() {
 
 export default function Overview() {
   const vehicles = useDemoVehicles()
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 5000)
+    return () => clearInterval(id)
+  }, [])
+
+  const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const dateStr = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })
 
   return (
     <div className="p-4 md:p-8 space-y-6 md:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="page-title">Мои автомобили</h1>
-          <p className="page-subtitle">Состояние батарей в реальном времени · {vehicles.length} {vehicles.length === 1 ? 'автомобиль' : 'автомобиля'}</p>
+          <h1 className="page-title">Главная</h1>
+          <p className="page-subtitle">Обзор парка · {vehicles.length} {vehicles.length === 1 ? 'автомобиль' : 'автомобилей'} · данные обновляются каждые 5 сек.</p>
         </div>
-        <div className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full"
-          style={{ backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}>
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          Онлайн
+        <div className="flex items-center gap-3">
+          <div className="text-right hidden sm:block">
+            <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1 }}>{timeStr}</p>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{dateStr}</p>
+          </div>
+          <div className="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full"
+            style={{ backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}>
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            Онлайн
+          </div>
         </div>
       </div>
 
