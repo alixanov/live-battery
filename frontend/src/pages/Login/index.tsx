@@ -17,7 +17,7 @@ export default function Login() {
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-2 mb-8">
           <Zap size={28} style={{ color: 'var(--accent)' }} />
-          <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>EV Battery</span>
+          <span className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>BatteryAI</span>
         </div>
         <div className="card">
           <h2 className="text-lg font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Войти в систему</h2>

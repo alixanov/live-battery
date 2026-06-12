@@ -232,7 +232,7 @@ function UsbModal({ onClose, onAdd }: { onClose: () => void; onAdd: (v: any) => 
                   className="flex-2 flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
                   style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff', boxShadow: '0 4px 12px rgba(34,197,94,0.3)', flex: 2 }}>
                   <Plus size={15} />
-                  Добавить в парк
+                  Добавить автомобиль
                 </button>
               </div>
             </div>
@@ -366,7 +366,7 @@ export default function Vehicles() {
         <div>
           <h1 className="page-title">Мои автомобили</h1>
           <p className="page-subtitle">
-            Управление парком · {vehicles.length} {vehicles.length === 1 ? 'автомобиль' : 'автомобилей'}
+            Список электромобилей · {vehicles.length} {vehicles.length === 1 ? 'автомобиль' : 'автомобилей'}
           </p>
         </div>
         <div className="flex items-center gap-2">

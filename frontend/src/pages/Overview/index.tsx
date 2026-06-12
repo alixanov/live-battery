@@ -235,7 +235,7 @@ export default function Overview() {
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="page-title">Главная</h1>
-          <p className="page-subtitle">Обзор парка · {vehicles.length} {vehicles.length === 1 ? 'автомобиль' : 'автомобилей'} · данные обновляются каждые 5 сек.</p>
+          <p className="page-subtitle">Состояние батарей · {vehicles.length} {vehicles.length === 1 ? 'автомобиль' : 'автомобилей'} · данные обновляются каждые 5 сек.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right hidden sm:block">

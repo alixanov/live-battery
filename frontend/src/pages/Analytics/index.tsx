@@ -86,7 +86,7 @@ function FleetStatusBar({ vehicles }: { vehicles: any[] }) {
       <div className="flex items-center gap-3 px-5 py-2.5" style={{ backgroundColor: 'var(--bg-surface)', borderBottom: '1px solid var(--border)' }}>
         <Activity size={13} style={{ color: 'var(--accent)' }} />
         <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
-          Мониторинг парка · {n} автомобилей · В режиме реального времени
+          Диагностика батарей · {n} автомобилей · В режиме реального времени
         </span>
         <span className="ml-auto flex items-center gap-1.5" style={{ fontSize: 12, color: '#22c55e' }}>
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -157,7 +157,7 @@ function FleetHealthOverview({ vehicles }: { vehicles: any[] }) {
           <div className="flex items-center gap-2 mb-1">
             <Battery size={15} style={{ color: '#22c55e' }} />
             <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
-              Состояние парка по категориям
+              Состояние батарей по категориям
             </span>
           </div>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>

@@ -5,7 +5,7 @@ import { useDemoAlerts } from '../../hooks/useDemoAlerts'
 import { useAppStore } from '../../store'
 
 const NAV = [
-  { to: '/',          label: 'Главная',    icon: LayoutDashboard, desc: 'Обзор парка' },
+  { to: '/',          label: 'Главная',    icon: LayoutDashboard, desc: 'Обзор системы' },
   { to: '/vehicles',  label: 'Мои авто',   icon: Car,             desc: 'Список авто' },
   { to: '/alerts',    label: 'Сигналы',    icon: Bell,            desc: 'Уведомления' },
   { to: '/analytics', label: 'Аналитика',  icon: BarChart3,        desc: 'Графики' },
@@ -41,10 +41,10 @@ export default function Sidebar() {
           </div>
           <div className="min-w-0">
             <p className="font-bold text-sm leading-tight truncate" style={{ color: 'var(--text-primary)' }}>
-              EV Battery
+              BatteryAI
             </p>
             <p className="text-xs leading-tight mt-0.5 truncate" style={{ color: 'var(--text-muted)' }}>
-              Мониторинг батарей
+              Прогноз деградации батарей
             </p>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function Sidebar() {
             style={{ background: 'linear-gradient(135deg, #3b82f6, #6366f1)', boxShadow: '0 2px 8px rgba(59,130,246,0.3)' }}>
             <Zap size={15} color="#fff" />
           </div>
-          <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>EV Battery</span>
+          <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>BatteryAI</span>
         </div>
         <div className="flex items-center gap-2">
           {criticalCount > 0 && (
@@ -198,8 +198,8 @@ export default function Sidebar() {
               <Zap size={18} color="#fff" />
             </div>
             <div>
-              <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>EV Battery</p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Мониторинг батарей</p>
+              <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>BatteryAI</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Прогноз деградации батарей</p>
             </div>
           </div>
           <button onClick={() => setMobileOpen(false)}
