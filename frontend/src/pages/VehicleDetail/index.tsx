@@ -128,46 +128,51 @@ export default function VehicleDetail() {
   return (
     <div className="p-4 md:p-8 space-y-5 md:space-y-6">
       {/* ── Header ── */}
-      <div className="flex items-center gap-4">
-        <Link to="/" className="p-2 rounded-lg transition-colors"
-          style={{ color: 'var(--text-muted)', backgroundColor: 'var(--bg-card)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
-          <ArrowLeft size={18} />
-        </Link>
-        <div className="flex-1 min-w-0">
-          <h1 className="page-title truncate">{vehicle.make} {vehicle.model}</h1>
-          <p className="page-subtitle">
-            {vehicle.plate_number || id} · {vehicle.year} · {vehicle.battery_chemistry} · {vehicle.battery_nominal_capacity} кВт·ч
-            {vehicle.battery_brand ? ` · ${vehicle.battery_brand}` : ''}
-          </p>
+      <div className="space-y-3">
+        {/* Row 1: back + title + status badge */}
+        <div className="flex items-center gap-3">
+          <Link to="/" className="shrink-0 p-2 rounded-lg transition-colors"
+            style={{ color: 'var(--text-muted)', backgroundColor: 'var(--bg-card)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+            <ArrowLeft size={18} />
+          </Link>
+          <div className="flex-1 min-w-0">
+            <h1 className="page-title truncate">{vehicle.make} {vehicle.model}</h1>
+            <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
+              {vehicle.plate_number || id} · {vehicle.year} · {vehicle.battery_chemistry} · {vehicle.battery_nominal_capacity} кВт·ч
+            </p>
+          </div>
+          {charging ? (
+            <span className="shrink-0 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-full font-medium"
+              style={{ backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}>
+              <Zap size={11} />
+              <span className="hidden sm:inline">Зарядка · </span>{last.current.toFixed(0)} А
+            </span>
+          ) : (
+            <span className="shrink-0 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-full font-medium"
+              style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#f87171' }}>
+              <Activity size={11} />
+              <span className="hidden sm:inline">Разряд · </span>{Math.abs(last.current).toFixed(0)} А
+            </span>
+          )}
         </div>
+        {/* Row 2: action buttons */}
         <div className="flex items-center gap-2">
           <button onClick={() => exportCSV(vehicle, last)}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg font-medium transition-colors"
             style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
             onMouseEnter={e => { e.currentTarget.style.color = '#22c55e'; e.currentTarget.style.borderColor = '#22c55e' }}
             onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}>
-            <Download size={12} /> Экспорт CSV
+            <Download size={13} /> <span>Экспорт CSV</span>
           </button>
           <button onClick={() => setEditOpen(true)}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg font-medium transition-colors"
             style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.borderColor = 'var(--accent)' }}
             onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'var(--border)' }}>
-            <Pencil size={12} /> Редактировать
+            <Pencil size={13} /> <span>Редактировать</span>
           </button>
-          {charging ? (
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium"
-              style={{ backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}>
-              <Zap size={12} /> Зарядка · {last.current.toFixed(0)} А
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium"
-              style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#f87171' }}>
-              <Activity size={12} /> Разряд · {Math.abs(last.current).toFixed(0)} А
-            </span>
-          )}
         </div>
       </div>
 
