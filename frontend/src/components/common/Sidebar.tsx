@@ -143,8 +143,6 @@ export default function Sidebar() {
           height: 56,
           backgroundColor: 'var(--bg-surface)',
           borderBottom: '1px solid var(--border)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
         }}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center"
