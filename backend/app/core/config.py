@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     DEBUG: bool = False
 
-    MONGODB_URL: str = "mongodb://mongo:OYcFWzUvjXfdtGVuLakKmZbYHzPCxEAO@trolley.proxy.rlwy.net:11955"
+    MONGODB_URL: str = "mongodb://localhost:27017"
     DATABASE_NAME: str = "evbis"
 
     JWT_SECRET_KEY: str = "evbis-super-secret-key-change-in-production"

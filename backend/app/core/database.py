@@ -18,7 +18,7 @@ async def connect_db():
         await create_indexes()
     except Exception as e:
         logger.error(f"MongoDB connection failed: {e}")
-        raise
+        # не падаем при старте — /api/health будет работать
 
 
 async def disconnect_db():
