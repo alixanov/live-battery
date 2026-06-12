@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Car, Battery, ChevronDown } from 'lucide-react'
 import { Vehicle } from '../utils/mockData'
 import { useAppStore } from '../store'
@@ -159,7 +160,7 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
 
   if (!open) return null
 
-  return (
+  return createPortal(
     <>
       {/* ── Backdrop ── */}
       <div
@@ -356,6 +357,7 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
           }
         }
       `}</style>
-    </>
+    </>,
+    document.body
   )
 }
