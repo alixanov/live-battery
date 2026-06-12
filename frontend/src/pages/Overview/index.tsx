@@ -86,20 +86,21 @@ function VehicleRow({ vehicle }: { vehicle: any }) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {charging && (
               <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
                 style={{ backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}>
-                <Zap size={11} /> Заряд
+                <Zap size={11} />
+                <span className="hidden sm:inline">Заряд</span>
               </span>
             )}
             {tempWarn && (
               <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium"
                 style={{ backgroundColor: 'rgba(239,68,68,0.12)', color: '#f87171' }}>
-                <Thermometer size={11} /> {last.temperature.toFixed(0)}°C
+                <Thermometer size={11} /> {last.temperature.toFixed(0)}°
               </span>
             )}
-            <span className="text-xs px-2 py-0.5 rounded font-medium"
+            <span className="hidden sm:inline text-xs px-2 py-0.5 rounded font-medium"
               style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-muted)' }}>
               {vehicle.battery_chemistry}
             </span>
@@ -108,7 +109,7 @@ function VehicleRow({ vehicle }: { vehicle: any }) {
         </div>
 
         {/* Metrics grid */}
-        <div className="grid grid-cols-4 gap-3 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           {[
             { label: 'SoC', value: `${last.soc.toFixed(1)}%`, color: socC },
             { label: 'SoH', value: `${last.soh.toFixed(1)}%`, color: sohC },

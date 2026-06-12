@@ -177,7 +177,7 @@ export default function VehicleDetail() {
       </div>
 
       {/* ── 4 key metrics ── */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label="Заряд (SoC)" value={last.soc.toFixed(1)} unit="%" color={socColor(last.soc)}
           prev={prev.soc} prevUnit="%" icon={<Battery size={16} style={{ color: socColor(last.soc) }} />} />
         <MetricCard label="Здоровье (SoH)" value={last.soh.toFixed(1)} unit="%"
@@ -192,7 +192,7 @@ export default function VehicleDetail() {
       </div>
 
       {/* ── SoC gauge + RUL degradation ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Gauge panel */}
         <div className="card flex flex-col items-center justify-center gap-5 py-6">
           <SoCGauge value={last.soc} size={190} />
@@ -230,7 +230,7 @@ export default function VehicleDetail() {
       </div>
 
       {/* ── Ток / Температура ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card">
           <p className="label mb-1">Зарядный ток</p>
           <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
@@ -407,12 +407,15 @@ export default function VehicleDetail() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto -mx-1">
-          <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+        <div className="overflow-x-auto -mx-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <table className="w-full text-sm" style={{ borderCollapse: 'collapse', minWidth: 380 }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Дата / Время', 'Нач. SoC', 'Кон. SoC', 'Энергия', 'Длительность', 'Стоимость'].map(h => (
-                  <th key={h} className="text-left py-2 px-3 text-xs font-medium" style={{ color: 'var(--text-muted)' }}>{h}</th>
+                {[['Дата', 'Дата / Время'], ['SoC↑', 'Нач. SoC'], ['SoC↓', 'Кон. SoC'], ['кВт·ч', 'Энергия'], ['Время', 'Длительность'], ['$', 'Стоимость']].map(([m, f]) => (
+                  <th key={f} className="text-left py-2 px-2 text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+                    <span className="sm:hidden">{m}</span>
+                    <span className="hidden sm:inline">{f}</span>
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -423,22 +426,22 @@ export default function VehicleDetail() {
                   style={{ borderBottom: i < chargingSessions.length - 1 ? '1px solid var(--border)' : 'none' }}
                   onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--bg-surface)')}
                   onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}>
-                  <td className="py-3 px-3 text-xs" style={{ color: 'var(--text-secondary)' }}>{s.startTime}</td>
-                  <td className="py-3 px-3">
+                  <td className="py-3 px-2 text-xs" style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>{s.startTime}</td>
+                  <td className="py-3 px-2">
                     <span className="text-xs font-medium" style={{ color: socColor(s.startSoc) }}>{s.startSoc}%</span>
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="py-3 px-2">
                     <span className="text-xs font-medium" style={{ color: socColor(s.endSoc) }}>{s.endSoc}%</span>
                   </td>
-                  <td className="py-3 px-3">
-                    <span className="text-xs font-bold" style={{ color: 'var(--accent)' }}>{s.kwh} кВт·ч</span>
+                  <td className="py-3 px-2">
+                    <span className="text-xs font-bold" style={{ color: 'var(--accent)', whiteSpace: 'nowrap' }}>{s.kwh} кВт·ч</span>
                   </td>
-                  <td className="py-3 px-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  <td className="py-3 px-2 text-xs" style={{ color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                     {s.durationMin >= 60
-                      ? `${Math.floor(s.durationMin / 60)} ч ${s.durationMin % 60} мин`
-                      : `${s.durationMin} мин`}
+                      ? `${Math.floor(s.durationMin / 60)}ч ${s.durationMin % 60}м`
+                      : `${s.durationMin}м`}
                   </td>
-                  <td className="py-3 px-3">
+                  <td className="py-3 px-2">
                     <span className="text-xs font-medium" style={{ color: '#22c55e' }}>${s.cost}</span>
                   </td>
                 </tr>

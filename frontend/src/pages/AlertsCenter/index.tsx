@@ -184,7 +184,7 @@ export default function AlertsCenter() {
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                         <span className="text-xs font-bold px-2 py-0.5 rounded-full"
                           style={{ backgroundColor: `${color}18`, color }}>
                           {PRIORITY_LABELS[a.priority]}
@@ -193,7 +193,7 @@ export default function AlertsCenter() {
                           style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-muted)' }}>
                           {a.vehicle_name}
                         </span>
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <span className="hidden sm:inline text-xs" style={{ color: 'var(--text-muted)' }}>
                           {a.value.toFixed(1)} {a.unit} / порог {a.threshold} {a.unit}
                         </span>
                       </div>
@@ -240,7 +240,7 @@ export default function AlertsCenter() {
 
                   {/* Expanded recommendation steps */}
                   {isExpanded && rec && (
-                    <div className="mt-3 ml-12 p-3 rounded-xl"
+                    <div className="mt-3 ml-0 sm:ml-12 p-3 rounded-xl"
                       style={{ backgroundColor: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)' }}>
                       <p className="text-xs font-semibold mb-2" style={{ color: 'var(--accent)' }}>
                         Что делать:

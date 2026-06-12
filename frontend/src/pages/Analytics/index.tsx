@@ -445,7 +445,7 @@ function VehicleCard({ vehicle }: { vehicle: any }) {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-4 divide-x" style={{ borderBottom: '1px solid var(--border)', borderColor: 'var(--border)' }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0" style={{ borderBottom: '1px solid var(--border)', borderColor: 'var(--border)' }}>
         {metrics.map(m => (
           <div key={m.key} className="px-2 py-3 text-center">
             <p style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -506,7 +506,7 @@ function VehicleCard({ vehicle }: { vehicle: any }) {
       </div>
 
       {/* Analytics row */}
-      <div className="grid grid-cols-3 divide-x" style={{ borderTop: '1px solid var(--border)', borderColor: 'var(--border)' }}>
+      <div className="grid grid-cols-3 divide-x" style={{ borderTop: '1px solid var(--border)', borderColor: 'var(--border)', overflowX: 'auto' }}>
         <div className="px-3 py-2.5 text-center">
           <p style={{ fontSize: 9, color: 'var(--text-muted)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Скорость деградации</p>
           <p style={{ fontSize: 13, fontWeight: 700, color: rate > 0.15 ? '#ef4444' : rate > 0.08 ? '#f59e0b' : '#22c55e' }}>

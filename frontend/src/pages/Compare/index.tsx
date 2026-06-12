@@ -202,7 +202,7 @@ function ResultScreen({ idA, idB, nameA, nameB, vA, vB, onReset }: any) {
   return (
     <div className="space-y-4">
       {/* Winner banner */}
-      <div className="card py-4 px-5 flex items-center justify-between"
+      <div className="card py-4 px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style={{ background: winner ? 'linear-gradient(135deg, rgba(34,197,94,0.08), rgba(59,130,246,0.08))' : undefined, border: '1px solid rgba(34,197,94,0.2)' }}>
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)', fontSize: 10 }}>Итог анализа</p>
@@ -226,7 +226,7 @@ function ResultScreen({ idA, idB, nameA, nameB, vA, vB, onReset }: any) {
       </div>
 
       {/* Vehicle cards */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {([
           { vehicle: vA, last: lastA, color: '#3b82f6', label: 'А' },
           { vehicle: vB, last: lastB, color: '#a78bfa', label: 'Б' },
@@ -270,7 +270,7 @@ function ResultScreen({ idA, idB, nameA, nameB, vA, vB, onReset }: any) {
       </div>
 
       {/* Radar + metrics */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="card">
           <p className="label mb-1">Радарная диаграмма</p>
           <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Нормализованное сравнение (выше = лучше)</p>

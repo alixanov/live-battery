@@ -370,32 +370,23 @@ export default function Vehicles() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {/* USB button */}
           <button onClick={() => setUsbOpen(true)}
-            className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-all"
-            style={{
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-secondary)',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#6366f1'
-              e.currentTarget.style.color = '#6366f1'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--border)'
-              e.currentTarget.style.color = 'var(--text-secondary)'
-            }}>
+            className="flex items-center gap-2 text-sm font-medium px-3 sm:px-4 py-2 rounded-lg transition-all"
+            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#6366f1'; e.currentTarget.style.color = '#6366f1' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)' }}>
             <Usb size={15} />
-            Подключить по USB
+            <span className="hidden sm:inline">Подключить по USB</span>
+            <span className="sm:hidden">USB</span>
           </button>
-          {/* Add button */}
           <button onClick={openAdd}
-            className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-all"
+            className="flex items-center gap-2 text-sm font-medium px-3 sm:px-4 py-2 rounded-lg transition-all"
             style={{ backgroundColor: 'var(--accent)', color: '#fff' }}
             onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
             onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
-            <Plus size={15} /> Добавить ТС
+            <Plus size={15} />
+            <span className="hidden sm:inline">Добавить ТС</span>
+            <span className="sm:hidden">Добавить</span>
           </button>
         </div>
       </div>
