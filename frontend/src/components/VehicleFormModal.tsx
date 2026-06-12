@@ -165,10 +165,8 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
       <div
         onClick={onClose}
         style={{
-          position: 'fixed', inset: 0, zIndex: 50,
-          backgroundColor: 'rgba(0,0,0,0.55)',
-          backdropFilter: 'blur(3px)',
-          WebkitBackdropFilter: 'blur(3px)',
+          position: 'fixed', inset: 0, zIndex: 200,
+          backgroundColor: 'rgba(0,0,0,0.65)',
           opacity: visible ? 1 : 0,
           transition: 'opacity 0.25s ease',
         }}
@@ -177,7 +175,7 @@ export default function VehicleFormModal({ open, onClose, editing }: Props) {
       {/* ── Modal: bottom-sheet on mobile, centered dialog on md+ ── */}
       <div
         style={{
-          position: 'fixed', zIndex: 51,
+          position: 'fixed', zIndex: 201,
           // Mobile: bottom sheet
           bottom: 0, left: 0, right: 0,
           // Desktop override via media query below
